@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 인사총무 어시스턴트 · 하나솔루션</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --main:#1E40AF; --sub:#3B82F6; --base:#F8FAFC; --text:#0F172A;
+    --line:#E2E8F0; --muted:#64748B; --danger:#DC2626; --danger-bg:#FEF2F2;
+    --ok-bg:#EFF6FF; --gray-bg:#F1F5F9; --gray-text:#475569; --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",Arial,sans-serif; background:var(--base); color:var(--text);}
+  .app{display:flex; min-height:100vh;}
+
+  .sidebar{width:240px; flex-shrink:0; background:#0B1D4D; color:#fff; display:flex; flex-direction:column; padding:28px 16px;}
+  .brand{padding:0 8px 28px; border-bottom:1px solid rgba(255,255,255,.12); margin-bottom:20px;}
+  .brand .logo{font-size:17px; font-weight:700;}
+  .brand .sub{font-size:12px; color:#93A5D1; margin-top:4px;}
+  .nav{display:flex; flex-direction:column; gap:4px;}
+  .nav-item{display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:8px; color:#C7D2E8; font-size:14px; cursor:pointer; transition:.15s;}
+  .nav-item:hover{background:rgba(255,255,255,.06);}
+  .nav-item.active{background:var(--sub); color:#fff; font-weight:600;}
+  .nav-icon{width:18px; text-align:center;}
+  .sidebar-foot{margin-top:auto; padding-top:16px; font-size:11px; color:#6B7FB0; border-top:1px solid rgba(255,255,255,.1);}
+
+  .content{flex:1; padding:32px 40px; max-width:1240px;}
+  .topbar{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:6px; flex-wrap:wrap; gap:12px;}
+  .topbar h1{font-size:22px; margin:0 0 4px;}
+  .topbar .desc{font-size:13px; color:var(--muted); margin:0;}
+  .actions{display:flex; gap:8px;}
+  .btn{display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; padding:9px 14px; border-radius:8px; cursor:pointer; border:1px solid transparent; user-select:none;}
+  .btn-primary{background:var(--main); color:#fff;}
+  .btn-primary:hover{background:#1B3699;}
+  .btn-outline{background:#fff; color:var(--main); border-color:#C7D2FE;}
+  .btn-outline:hover{background:#EEF2FF;}
+
+  .toast{position:fixed; top:20px; right:20px; background:var(--main); color:#fff; padding:11px 18px; border-radius:8px; font-size:13px; box-shadow:0 8px 24px rgba(30,64,175,.28); opacity:0; transform:translateY(-8px); transition:.25s; pointer-events:none; z-index:99; max-width:320px;}
+  .toast.show{opacity:1; transform:translateY(0);}
+
+  .panel{background:#fff; border:1px solid var(--line); border-radius:14px; margin-top:18px; overflow:hidden;}
+  .panel-note{padding:14px 20px; font-size:12.5px; color:var(--muted); background:#F5F8FF; border-bottom:1px solid var(--line); line-height:1.65;}
+  .panel-note b{color:var(--main);}
+
+  .stats-row{display:flex; gap:12px; margin-top:16px; flex-wrap:wrap;}
+  .stat-card{flex:1; min-width:140px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 18px;}
+  .stat-card .label{font-size:12px; color:var(--muted); margin-bottom:6px;}
+  .stat-card .value{font-size:22px; font-weight:700; color:var(--main);}
+  .stat-card.warn .value{color:var(--danger);}
+  .stat-card.muted .value{color:var(--gray-text);}
+
+  .toolbar{display:flex; align-items:center; gap:10px; padding:14px 20px; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+  .toolbar label{font-size:12.5px; color:var(--muted); font-weight:600;}
+  .toolbar select{padding:6px 10px; border:1px solid var(--line); border-radius:7px; font-size:13px; background:#fff;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  thead th{background:var(--main); color:#fff; font-weight:600; text-align:center; padding:11px 8px; white-space:nowrap;}
+  tbody td{padding:9px 8px; text-align:center; border-bottom:1px solid var(--line); white-space:nowrap;}
+  tbody tr:hover{background:#F8FAFF;}
+  tbody input, tbody select{width:100%; border:1px solid var(--line); border-radius:6px; padding:5px 6px; font-size:13px; text-align:center; font-family:inherit; color:var(--text); background:#fff;}
+  tbody input:focus, tbody select:focus{outline:none; border-color:var(--sub); box-shadow:0 0 0 2px rgba(59,130,246,.18);}
+  tbody input[type=checkbox]{width:16px; height:16px;}
+  .badge{display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:600;}
+  .badge-ok{background:var(--ok-bg); color:var(--main);}
+  .badge-warn{background:var(--danger-bg); color:var(--danger);}
+  .badge-muted{background:var(--gray-bg); color:var(--gray-text);}
+  .num{text-align:right !important; font-variant-numeric:tabular-nums;}
+  .name-cell{font-weight:600;}
+
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+  .table-scroll{overflow-x:auto;}
+  .foot-note{padding:10px 20px; font-size:11.5px; color:#94A3B8; border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">하나솔루션</div>
+      <div class="sub">AI 인사총무 어시스턴트</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-item active" data-tab="attendance"><span class="nav-icon">🕘</span> 근태·연차 관리</div>
+      <div class="nav-item" data-tab="payroll"><span class="nav-icon">💳</span> 급여대장</div>
+      <div class="nav-item" data-tab="asset"><span class="nav-icon">💻</span> 자산·비품 관리</div>
+      <div class="nav-item" data-tab="retirement"><span class="nav-icon">🏦</span> 퇴직금·연금</div>
+    </nav>
+    <div class="sidebar-foot">전 데이터는 브라우저 메모리에서만<br/>처리되며 서버로 전송되지 않습니다.</div>
+  </aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div>
+        <h1 id="pageTitle">근태·연차 관리</h1>
+        <p class="desc" id="pageDesc">실제 출근시각과 사용 연차를 입력하면 지각여부·잔여연차가 자동으로 계산됩니다.</p>
+      </div>
+      <div class="actions">
+        <label class="btn btn-outline">📤 엑셀 업로드
+          <input type="file" id="fileInput" accept=".xlsx,.xls" hidden />
+        </label>
+        <button class="btn btn-primary" id="downloadBtn">📥 엑셀 다운로드</button>
+      </div>
+    </div>
+
+    <!-- 근태·연차 -->
+    <section id="tab-attendance" class="tab-panel active">
+      <div class="panel">
+        <div class="panel-note">정규 출근시각은 09:00 기준입니다. 실제출근시각·사용연차를 수정하면 지각여부·잔여연차가 즉시 다시 계산됩니다. 여기서 계산된 <b>잔여연차</b>는 급여대장 탭의 연차수당 계산에도 그대로 연결됩니다.</div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th>사번</th><th>이름</th><th>부서</th><th>정규출근</th><th>실제출근</th>
+              <th>지각여부</th><th>부여연차(일)</th><th>사용연차(일)</th><th>잔여연차(일)</th>
+            </tr></thead>
+            <tbody id="attendanceBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 급여대장 -->
+    <section id="tab-payroll" class="tab-panel">
+      <div class="panel">
+        <div class="panel-note">
+          4대보험 요율(근로자 부담분, 2024년 기준): 국민연금 4.5% · 건강보험 3.545% · 장기요양보험(건보료의 12.95%) · 고용보험 0.9%.
+          산재보험은 전액 사업주 부담이라 공제 대상에서 제외했습니다.<br/>
+          <b>원천세(예시)</b>란 매달 월급에서 미리 떼는 근로소득세(원천징수)를 말해요. 실제로는 국세청 <b>근로소득 간이세액표</b>를 급여액·부양가족 수 기준으로 찾아 적용하는데,
+          이 데모는 계산 구조만 보여주기 위해 <b>기본급의 3%</b>라는 임의 예시 요율을 쓴 것이라 실제 세액과는 다릅니다. 실무 적용 시 이 부분만 실제 간이세액표 조회 로직으로 교체하면 됩니다.<br/>
+          <b>연차수당</b> 체크박스를 켜면 근태 탭의 잔여(미사용)연차를 "1일 통상임금(기본급÷30) × 잔여일수"로 환산해 지급총액에 더해서 계산합니다(간이 추정치).
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th>사번</th><th>이름</th><th>기본급</th><th>잔여연차(일)</th><th>연차수당 포함</th><th>연차수당</th>
+              <th>지급총액</th><th>국민연금</th><th>건강보험</th><th>장기요양</th><th>고용보험</th><th>원천세(예시)</th>
+              <th>공제합계</th><th>실수령액</th>
+            </tr></thead>
+            <tbody id="payrollBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 자산·비품 -->
+    <section id="tab-asset" class="tab-panel">
+      <div class="stats-row" id="assetStats"></div>
+      <div class="panel" style="margin-top:14px;">
+        <div class="panel-note">사용자(이름)는 사용자 사번을 근태 탭 임직원 명단과 매칭해 자동으로 표시됩니다. 사용자가 지정되지 않은 자산은 "미사용(재고)"로 집계됩니다. 교체예정일이 지났거나 미반납 상태면 "확인필요"로 표시됩니다.</div>
+        <div class="toolbar">
+          <label>자산종류 필터</label>
+          <select id="assetFilter"></select>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th>자산번호</th><th>자산종류</th><th>모델명</th><th>지급일자</th><th>사용자</th>
+              <th>사용자(이름)</th><th>교체주기(개월)</th><th>교체예정일</th><th>교체도래</th><th>반납여부</th><th>상태</th>
+            </tr></thead>
+            <tbody id="assetBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 퇴직금·연금 -->
+    <section id="tab-retirement" class="tab-panel">
+      <div class="panel">
+        <div class="panel-note">
+          <b>퇴직금 추정액</b>은 "1개월 평균임금(≈기본급) × 근속연수"로 계산한 간이 추정치입니다. 실제 퇴직금은 근로기준법상 <b>퇴직 직전 3개월 평균임금</b>(상여금·연차수당 등 포함)을 기준으로 계산하므로 실제 지급액과 차이가 있을 수 있습니다.<br/>
+          <b>퇴직연금 유형</b>이 DC(확정기여형)인 경우, 회사는 매년 <b>연간 임금총액의 1/12 이상</b>을 부담금으로 적립해야 합니다(연간 적립액 추정 = 기본급 1개월분으로 근사).
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th>사번</th><th>이름</th><th>입사일</th><th>근속연수(년)</th><th>기본급(월)</th>
+              <th>퇴직금 추정액</th><th>퇴직연금 유형</th><th>연간 적립액 추정(DC)</th>
+            </tr></thead>
+            <tbody id="retirementBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <p class="foot-note">※ 전 항목은 가상 임직원 기준 샘플 데이터이며, 값을 직접 수정하거나 엑셀 업로드로 교체할 수 있습니다. 모든 세율·퇴직금 계산은 실무 참고용 간이 추정치입니다.</p>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   1. 데이터 모델
+   ══════════════════════════════════════════════════════════ */
+let employees = [
+  {empId:"EMP001", name:"김서준", dept:"인사총무팀", hireDate:"2021-03-02"},
+  {empId:"EMP002", name:"이하은", dept:"경영지원팀", hireDate:"2022-07-15"},
+  {empId:"EMP003", name:"박도윤", dept:"연구개발팀", hireDate:"2020-01-10"},
+  {empId:"EMP004", name:"최지우", dept:"연구개발팀", hireDate:"2023-02-20"},
+  {empId:"EMP005", name:"정민준", dept:"영업팀",     hireDate:"2019-11-03"},
+  {empId:"EMP006", name:"강서연", dept:"영업팀",     hireDate:"2022-09-01"},
+  {empId:"EMP007", name:"조유준", dept:"품질관리팀", hireDate:"2021-08-18"},
+  {empId:"EMP008", name:"윤아린", dept:"품질관리팀", hireDate:"2023-04-05"},
+  {empId:"EMP009", name:"임태현", dept:"경영지원팀", hireDate:"2018-06-12"},
+  {empId:"EMP010", name:"한소율", dept:"연구개발팀", hireDate:"2022-01-25"},
+];
+
+let attendance = [
+  {empId:"EMP001", stdTime:"09:00", actTime:"08:55", totalLeave:15, usedLeave:4},
+  {empId:"EMP002", stdTime:"09:00", actTime:"09:12", totalLeave:15, usedLeave:9},
+  {empId:"EMP003", stdTime:"09:00", actTime:"09:03", totalLeave:16, usedLeave:2},
+  {empId:"EMP004", stdTime:"09:00", actTime:"09:30", totalLeave:16, usedLeave:11},
+  {empId:"EMP005", stdTime:"09:00", actTime:"08:48", totalLeave:17, usedLeave:6},
+  {empId:"EMP006", stdTime:"09:00", actTime:"09:00", totalLeave:15, usedLeave:0},
+  {empId:"EMP007", stdTime:"09:00", actTime:"09:20", totalLeave:16, usedLeave:8},
+  {empId:"EMP008", stdTime:"09:00", actTime:"09:07", totalLeave:15, usedLeave:3},
+  {empId:"EMP009", stdTime:"09:00", actTime:"08:59", totalLeave:17, usedLeave:15},
+  {empId:"EMP010", stdTime:"09:00", actTime:"09:45", totalLeave:16, usedLeave:5},
+];
+
+let payroll = [
+  {empId:"EMP001", baseSalary:3200000, includeLeavePay:false},
+  {empId:"EMP002", baseSalary:2900000, includeLeavePay:false},
+  {empId:"EMP003", baseSalary:4100000, includeLeavePay:false},
+  {empId:"EMP004", baseSalary:3800000, includeLeavePay:false},
+  {empId:"EMP005", baseSalary:3500000, includeLeavePay:false},
+  {empId:"EMP006", baseSalary:3300000, includeLeavePay:false},
+  {empId:"EMP007", baseSalary:3600000, includeLeavePay:false},
+  {empId:"EMP008", baseSalary:3000000, includeLeavePay:false},
+  {empId:"EMP009", baseSalary:4500000, includeLeavePay:false},
+  {empId:"EMP010", baseSalary:3100000, includeLeavePay:false},
+];
+
+let assets = [
+  {assetNo:"IT-001", kind:"노트북", model:"LG그램 15Z90",   issueDate:"2022-03-02", userId:"EMP003", cycle:36, returned:"미반납"},
+  {assetNo:"IT-002", kind:"노트북", model:"맥북 에어 M2",    issueDate:"2023-07-15", userId:"EMP005", cycle:36, returned:"반납완료"},
+  {assetNo:"IT-003", kind:"모니터", model:"LG 27인치 4K",    issueDate:"2021-05-10", userId:"EMP001", cycle:60, returned:"미반납"},
+  {assetNo:"IT-004", kind:"노트북", model:"삼성 갤럭시북4",  issueDate:"2024-01-20", userId:"EMP008", cycle:36, returned:"미반납"},
+  {assetNo:"IT-005", kind:"모니터", model:"삼성 24인치 FHD", issueDate:"2020-11-03", userId:"EMP009", cycle:60, returned:"미반납"},
+  {assetNo:"IT-006", kind:"노트북", model:"LG그램 16",       issueDate:"2023-09-01", userId:"EMP002", cycle:36, returned:"미반납"},
+  {assetNo:"IT-007", kind:"태블릿", model:"아이패드 에어",   issueDate:"2022-08-18", userId:"EMP006", cycle:24, returned:"반납완료"},
+  {assetNo:"IT-008", kind:"노트북", model:"맥북 프로 14",    issueDate:"2024-04-05", userId:"EMP010", cycle:36, returned:"미반납"},
+  {assetNo:"IT-009", kind:"노트북", model:"LG그램 14",       issueDate:"2024-06-01", userId:"",       cycle:36, returned:"재고"},
+  {assetNo:"IT-010", kind:"모니터", model:"LG 24인치 FHD",   issueDate:"2024-02-15", userId:"",       cycle:60, returned:"재고"},
+  {assetNo:"IT-011", kind:"태블릿", model:"갤럭시탭 S9",     issueDate:"2024-05-10", userId:"",       cycle:24, returned:"재고"},
+];
+
+/* ══════════════════════════════════════════════════════════
+   2. 계산 로직
+   ══════════════════════════════════════════════════════════ */
+const empOf   = (empId) => employees.find(e => e.empId === empId);
+const nameOf  = (empId) => (empOf(empId) || {}).name || "미배정";
+const remainLeaveOf = (empId) => {
+  const a = attendance.find(r => r.empId === empId);
+  return a ? (a.totalLeave - a.usedLeave) : 0;
+};
+
+function isLate(std, act){ return act > std; }
+
+function addMonths(dateStr, months){
+  const d = new Date(dateStr);
+  d.setMonth(d.getMonth() + Number(months));
+  return d.toISOString().slice(0,10);
+}
+function yearsBetween(dateStr){
+  const ms = new Date() - new Date(dateStr);
+  return ms / (1000*60*60*24*365.25);
+}
+const fmtNum = (n) => Number(n||0).toLocaleString("ko-KR");
+const today = () => new Date().toISOString().slice(0,10);
+
+/* ══════════════════════════════════════════════════════════
+   3. 렌더링 — 근태
+   ══════════════════════════════════════════════════════════ */
+function renderAttendance(){
+  const body = document.getElementById("attendanceBody");
+  body.innerHTML = attendance.map((row, i) => {
+    const emp = empOf(row.empId) || {};
+    const late = isLate(row.stdTime, row.actTime);
+    const remain = row.totalLeave - row.usedLeave;
+    return `<tr>
+      <td>${row.empId}</td>
+      <td class="name-cell">${emp.name||"-"}</td>
+      <td>${emp.dept||"-"}</td>
+      <td><input type="time" value="${row.stdTime}" onchange="attendance[${i}].stdTime=this.value; renderAll();"></td>
+      <td><input type="time" value="${row.actTime}" onchange="attendance[${i}].actTime=this.value; renderAll();"></td>
+      <td>${late ? '<span class="badge badge-warn">지각</span>' : '<span class="badge badge-ok">정상</span>'}</td>
+      <td><input type="number" value="${row.totalLeave}" min="0" onchange="attendance[${i}].totalLeave=Number(this.value); renderAll();"></td>
+      <td><input type="number" value="${row.usedLeave}" min="0" onchange="attendance[${i}].usedLeave=Number(this.value); renderAll();"></td>
+      <td class="num">${remain}일</td>
+    </tr>`;
+  }).join("");
+}
+
+/* ══════════════════════════════════════════════════════════
+   4. 렌더링 — 급여 (연차수당 반영)
+   ══════════════════════════════════════════════════════════ */
+function renderPayroll(){
+  const body = document.getElementById("payrollBody");
+  body.innerHTML = payroll.map((row, i) => {
+    const base = Number(row.baseSalary) || 0;
+    const remain = remainLeaveOf(row.empId);
+    const dailyWage = Math.round(base/30);
+    const leavePay = Math.round(dailyWage * remain);
+    const gross = base + (row.includeLeavePay ? leavePay : 0);
+
+    const np = Math.round(gross * 0.045);
+    const hi = Math.round(gross * 0.03545);
+    const lt = Math.round(hi * 0.1295);
+    const ei = Math.round(gross * 0.009);
+    const tax = Math.round(gross * 0.03);
+    const total = np + hi + lt + ei + tax;
+    const net = gross - total;
+
+    return `<tr>
+      <td>${row.empId}</td>
+      <td class="name-cell">${nameOf(row.empId)}</td>
+      <td><input type="number" class="num" value="${base}" step="10000" onchange="payroll[${i}].baseSalary=Number(this.value); renderAll();"></td>
+      <td class="num">${remain}일</td>
+      <td><input type="checkbox" ${row.includeLeavePay?"checked":""} onchange="payroll[${i}].includeLeavePay=this.checked; renderAll();"></td>
+      <td class="num">${fmtNum(row.includeLeavePay ? leavePay : 0)}</td>
+      <td class="num" style="font-weight:600;">${fmtNum(gross)}</td>
+      <td class="num">${fmtNum(np)}</td>
+      <td class="num">${fmtNum(hi)}</td>
+      <td class="num">${fmtNum(lt)}</td>
+      <td class="num">${fmtNum(ei)}</td>
+      <td class="num">${fmtNum(tax)}</td>
+      <td class="num">${fmtNum(total)}</td>
+      <td class="num" style="font-weight:700; color:var(--main);">${fmtNum(net)}</td>
+    </tr>`;
+  }).join("");
+}
+
+/* ══════════════════════════════════════════════════════════
+   5. 렌더링 — 자산 (필터 + 미사용 카운트)
+   ══════════════════════════════════════════════════════════ */
+let assetKindFilter = "전체";
+
+function computeAssetView(row){
+  const t = today();
+  const dueDate = addMonths(row.issueDate, row.cycle);
+  const dueFlag = dueDate <= t ? "교체필요" : "정상";
+  const inUse = !!row.userId;
+  const status = !inUse ? "재고" : ((dueFlag === "교체필요" || row.returned === "미반납") ? "확인필요" : "정상");
+  return {dueDate, dueFlag, inUse, status};
+}
+
+function renderAssetFilterOptions(){
+  const sel = document.getElementById("assetFilter");
+  const kinds = ["전체", ...Array.from(new Set(assets.map(a => a.kind)))];
+  sel.innerHTML = kinds.map(k => `<option value="${k}" ${k===assetKindFilter?"selected":""}>${k}</option>`).join("");
+}
+
+function renderAssetStats(){
+  const total = assets.length;
+  const inUse = assets.filter(a => !!a.userId).length;
+  const unused = total - inUse;
+  const needCheck = assets.filter(a => computeAssetView(a).status === "확인필요").length;
+  document.getElementById("assetStats").innerHTML = `
+    <div class="stat-card"><div class="label">전체 자산</div><div class="value">${total}대</div></div>
+    <div class="stat-card"><div class="label">사용중</div><div class="value">${inUse}대</div></div>
+    <div class="stat-card muted"><div class="label">미사용(재고)</div><div class="value">${unused}대</div></div>
+    <div class="stat-card warn"><div class="label">확인필요</div><div class="value">${needCheck}대</div></div>
+  `;
+}
+
+function renderAsset(){
+  renderAssetFilterOptions();
+  renderAssetStats();
+  const body = document.getElementById("assetBody");
+  const rows = assets
+    .map((row, i) => ({row, i}))
+    .filter(({row}) => assetKindFilter === "전체" || row.kind === assetKindFilter);
+
+  body.innerHTML = rows.map(({row, i}) => {
+    const {dueDate, dueFlag, status} = computeAssetView(row);
+    const statusBadge = status === "재고"
+      ? '<span class="badge badge-muted">재고</span>'
+      : (status === "확인필요" ? '<span class="badge badge-warn">확인필요</span>' : '<span class="badge badge-ok">정상</span>');
+    const dueBadge = dueFlag === "교체필요" ? '<span class="badge badge-warn">교체필요</span>' : '<span class="badge badge-ok">정상</span>';
+
+    return `<tr>
+      <td>${row.assetNo}</td>
+      <td>${row.kind}</td>
+      <td>${row.model}</td>
+      <td><input type="date" value="${row.issueDate}" onchange="assets[${i}].issueDate=this.value; renderAll();"></td>
+      <td>
+        <select onchange="assets[${i}].userId=this.value; renderAll();">
+          <option value="" ${row.userId===""?"selected":""}>미배정(재고)</option>
+          ${employees.map(e => `<option value="${e.empId}" ${e.empId===row.userId?"selected":""}>${e.empId}</option>`).join("")}
+        </select>
+      </td>
+      <td class="name-cell">${row.userId ? nameOf(row.userId) : "-"}</td>
+      <td><input type="number" value="${row.cycle}" min="1" onchange="assets[${i}].cycle=Number(this.value); renderAll();"></td>
+      <td>${dueDate}</td>
+      <td>${dueBadge}</td>
+      <td>
+        <select onchange="assets[${i}].returned=this.value; renderAll();">
+          <option ${row.returned==="반납완료"?"selected":""}>반납완료</option>
+          <option ${row.returned==="미반납"?"selected":""}>미반납</option>
+          <option ${row.returned==="재고"?"selected":""}>재고</option>
+        </select>
+      </td>
+      <td>${statusBadge}</td>
+    </tr>`;
+  }).join("");
+}
+
+document.addEventListener("change", (e) => {
+  if (e.target && e.target.id === "assetFilter"){
+    assetKindFilter = e.target.value;
+    renderAsset();
+  }
+});
+
+/* ══════════════════════════════════════════════════════════
+   6. 렌더링 — 퇴직금·연금
+   ══════════════════════════════════════════════════════════ */
+let retirementTypes = {}; // empId -> "DC" | "DB"
+
+function renderRetirement(){
+  const body = document.getElementById("retirementBody");
+  body.innerHTML = employees.map((emp, i) => {
+    const pay = payroll.find(p => p.empId === emp.empId) || {baseSalary:0};
+    const years = yearsBetween(emp.hireDate);
+    const yearsFmt = years.toFixed(1);
+    const severance = Math.round(pay.baseSalary * years);
+    const type = retirementTypes[emp.empId] || (i % 2 === 0 ? "DC" : "DB");
+    retirementTypes[emp.empId] = type;
+    const dcAnnual = type === "DC" ? pay.baseSalary : 0;
+
+    return `<tr>
+      <td>${emp.empId}</td>
+      <td class="name-cell">${emp.name}</td>
+      <td><input type="date" value="${emp.hireDate}" onchange="employees[${i}].hireDate=this.value; renderAll();"></td>
+      <td class="num">${yearsFmt}년</td>
+      <td class="num">${fmtNum(pay.baseSalary)}</td>
+      <td class="num" style="font-weight:700; color:var(--main);">${fmtNum(severance)}</td>
+      <td>
+        <select onchange="retirementTypes['${emp.empId}']=this.value; renderRetirement();">
+          <option ${type==="DC"?"selected":""}>DC</option>
+          <option ${type==="DB"?"selected":""}>DB</option>
+        </select>
+      </td>
+      <td class="num">${type==="DC" ? fmtNum(dcAnnual) : "-"}</td>
+    </tr>`;
+  }).join("");
+}
+
+function renderAll(){ renderAttendance(); renderPayroll(); renderAsset(); renderRetirement(); }
+
+/* ══════════════════════════════════════════════════════════
+   7. 탭 전환
+   ══════════════════════════════════════════════════════════ */
+const tabInfo = {
+  attendance: {title:"근태·연차 관리", desc:"실제 출근시각과 사용 연차를 입력하면 지각여부·잔여연차가 자동으로 계산됩니다."},
+  payroll:    {title:"급여대장", desc:"기본급을 입력하면 4대보험 공제액과 실수령액이 자동으로 계산됩니다. 연차수당 포함 여부도 선택할 수 있습니다."},
+  asset:      {title:"자산·비품 관리", desc:"지급일자·교체주기를 입력하면 교체예정일과 확인 필요 여부가 자동으로 계산됩니다."},
+  retirement: {title:"퇴직금·연금", desc:"입사일 기준 근속연수로 퇴직금 추정액과 DC형 퇴직연금 연간 적립액을 계산합니다."},
+};
+document.querySelectorAll(".nav-item").forEach(item => {
+  item.addEventListener("click", () => {
+    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    item.classList.add("active");
+    const tab = item.dataset.tab;
+    document.getElementById("tab-" + tab).classList.add("active");
+    document.getElementById("pageTitle").textContent = tabInfo[tab].title;
+    document.getElementById("pageDesc").textContent = tabInfo[tab].desc;
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   8. 엑셀 다운로드
+   ══════════════════════════════════════════════════════════ */
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const wb = XLSX.utils.book_new();
+
+  const attRows = attendance.map(r => {
+    const emp = empOf(r.empId) || {};
+    return {
+      "사번": r.empId, "이름": emp.name, "부서": emp.dept, "입사일": emp.hireDate,
+      "정규출근시각": r.stdTime, "실제출근시각": r.actTime,
+      "지각여부": isLate(r.stdTime, r.actTime) ? "지각" : "정상",
+      "연간부여연차(일)": r.totalLeave, "사용연차(일)": r.usedLeave, "잔여연차(일)": r.totalLeave - r.usedLeave,
+    };
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(attRows), "1.근태_연차현황");
+
+  const payRows = payroll.map(r => {
+    const base = Number(r.baseSalary) || 0;
+    const remain = remainLeaveOf(r.empId);
+    const dailyWage = Math.round(base/30);
+    const leavePay = Math.round(dailyWage * remain);
+    const gross = base + (r.includeLeavePay ? leavePay : 0);
+    const np = Math.round(gross*0.045), hi = Math.round(gross*0.03545), lt = Math.round(hi*0.1295);
+    const ei = Math.round(gross*0.009), tax = Math.round(gross*0.03);
+    const total = np+hi+lt+ei+tax;
+    return {
+      "사번": r.empId, "이름": nameOf(r.empId), "기본급": base, "잔여연차(일)": remain,
+      "연차수당포함": r.includeLeavePay ? "Y" : "N", "연차수당": r.includeLeavePay ? leavePay : 0,
+      "지급총액": gross, "국민연금(4.5%)": np, "건강보험(3.545%)": hi, "장기요양보험(건보료의12.95%)": lt,
+      "고용보험(0.9%)": ei, "원천세(예시3%)": tax, "공제합계": total, "실수령액": gross-total,
+    };
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(payRows), "2.급여대장_실수령액");
+
+  const assetRows = assets.map(r => {
+    const {dueDate, dueFlag, status} = computeAssetView(r);
+    return {
+      "자산번호": r.assetNo, "자산종류": r.kind, "모델명": r.model, "지급일자": r.issueDate,
+      "사용자 사번": r.userId, "사용자(이름)": r.userId ? nameOf(r.userId) : "", "교체주기(개월)": r.cycle,
+      "교체예정일": dueDate, "교체도래여부": dueFlag, "반납여부": r.returned, "상태(종합판정)": status,
+    };
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(assetRows), "3.자산_비품관리");
+
+  const retireRows = employees.map(emp => {
+    const pay = payroll.find(p => p.empId === emp.empId) || {baseSalary:0};
+    const years = yearsBetween(emp.hireDate);
+    const type = retirementTypes[emp.empId] || "DC";
+    return {
+      "사번": emp.empId, "이름": emp.name, "입사일": emp.hireDate, "근속연수(년)": Number(years.toFixed(1)),
+      "기본급(월)": pay.baseSalary, "퇴직금추정액": Math.round(pay.baseSalary*years),
+      "퇴직연금유형": type, "연간적립액추정(DC)": type==="DC" ? pay.baseSalary : 0,
+    };
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(retireRows), "4.퇴직금_퇴직연금");
+
+  XLSX.writeFile(wb, "인사총무_통합_자동화_데모.xlsx");
+  showToast("엑셀 파일이 다운로드되었습니다.");
+});
+
+/* ══════════════════════════════════════════════════════════
+   9. 엑셀 업로드 — 정형 템플릿 + "이름+급여"만 있는 간단한 표도 인식
+   ══════════════════════════════════════════════════════════ */
+function genEmpId(name, index){
+  return "TMP" + String(index+1).padStart(3,"0") + "_" + name;
+}
+
+function tryParseStructured(wb){
+  let matched = false;
+
+  const s1 = wb.Sheets["1.근태_연차현황"];
+  if (s1){
+    const rows = XLSX.utils.sheet_to_json(s1);
+    if (rows.length){
+      matched = true;
+      const seen = new Set();
+      employees = rows.map(r => ({
+        empId:String(r["사번"]), name:r["이름"], dept:r["부서"]||"-",
+        hireDate: r["입사일"] ? String(r["입사일"]).slice(0,10) : "2023-01-01",
+      })).filter(e => !seen.has(e.empId) && seen.add(e.empId));
+      attendance = rows.map(r => ({
+        empId: String(r["사번"]), stdTime: r["정규출근시각"] || "09:00", actTime: r["실제출근시각"] || "09:00",
+        totalLeave: Number(r["연간부여연차(일)"]) || 0, usedLeave: Number(r["사용연차(일)"]) || 0,
+      }));
+    }
+  }
+  const s2 = wb.Sheets["2.급여대장_실수령액"];
+  if (s2){
+    const rows = XLSX.utils.sheet_to_json(s2);
+    if (rows.length){
+      matched = true;
+      payroll = rows.map(r => ({
+        empId:String(r["사번"]), baseSalary:Number(r["기본급"])||0,
+        includeLeavePay: (r["연차수당포함"]==="Y"),
+      }));
+    }
+  }
+  const s3 = wb.Sheets["3.자산_비품관리"];
+  if (s3){
+    const rows = XLSX.utils.sheet_to_json(s3);
+    if (rows.length){
+      matched = true;
+      assets = rows.map(r => ({
+        assetNo:r["자산번호"], kind:r["자산종류"], model:r["모델명"],
+        issueDate: (r["지급일자"] instanceof Date) ? r["지급일자"].toISOString().slice(0,10) : String(r["지급일자"]),
+        userId:String(r["사용자 사번"]||""), cycle:Number(r["교체주기(개월)"])||36,
+        returned:r["반납여부"]|| (r["사용자 사번"] ? "미반납" : "재고"),
+      }));
+    }
+  }
+  const s4 = wb.Sheets["4.퇴직금_퇴직연금"];
+  if (s4){
+    const rows = XLSX.utils.sheet_to_json(s4);
+    rows.forEach(r => { if (r["사번"] && r["퇴직연금유형"]) retirementTypes[String(r["사번"])] = r["퇴직연금유형"]; });
+  }
+  return matched;
+}
+
+// "이름"과 "급여/기본급/월급/연봉" 컬럼만 있는 단순한 표도 급여대장에 자동 반영
+function tryParseSimplePayroll(wb){
+  const sheetName = wb.SheetNames[0];
+  if (!sheetName) return false;
+  const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
+  if (!rows.length) return false;
+
+  const headers = Object.keys(rows[0]);
+  const nameKey = headers.find(h => ["이름","성명","직원명"].includes(h));
+  const salaryKey = headers.find(h => ["급여","기본급","월급","연봉","급여(월)"].includes(h));
+  if (!nameKey || !salaryKey) return false;
+
+  const isAnnual = salaryKey === "연봉";
+  rows.forEach((r, idx) => {
+    const name = String(r[nameKey]).trim();
+    let salary = Number(r[salaryKey]) || 0;
+    if (isAnnual) salary = Math.round(salary/12);
+    if (!name || !salary) return;
+
+    let emp = employees.find(e => e.name === name);
+    if (!emp){
+      emp = {empId: genEmpId(name, employees.length), name, dept:"-", hireDate:"2023-01-01"};
+      employees.push(emp);
+      attendance.push({empId:emp.empId, stdTime:"09:00", actTime:"09:00", totalLeave:15, usedLeave:0});
+    }
+    let pr = payroll.find(p => p.empId === emp.empId);
+    if (!pr){ pr = {empId:emp.empId, baseSalary:0, includeLeavePay:false}; payroll.push(pr); }
+    pr.baseSalary = salary;
+  });
+  return true;
+}
+
+document.getElementById("fileInput").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try{
+      const wb = XLSX.read(evt.target.result, {type:"array"});
+      const structured = tryParseStructured(wb);
+      if (!structured){
+        const simple = tryParseSimplePayroll(wb);
+        if (!simple){
+          showToast("인식 가능한 컬럼(사번/이름/기본급 등)을 찾지 못했습니다.");
+          return;
+        }
+        showToast("이름·급여 데이터를 급여대장에 반영했습니다.");
+      } else {
+        showToast("엑셀 데이터를 불러왔습니다.");
+      }
+      renderAll();
+    }catch(err){
+      showToast("업로드 실패: 파일 형식을 확인해주세요.");
+      console.error(err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value = "";
+});
+
+/* ══════════════════════════════════════════════════════════
+   10. 초기 렌더링
+   ══════════════════════════════════════════════════════════ */
+renderAll();
+</script>
+</body>
+</html>

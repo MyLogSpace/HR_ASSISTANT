@@ -23,6 +23,8 @@
   .nav-item{display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:8px; color:#C7D2E8; font-size:14px; cursor:pointer; transition:.15s;}
   .nav-item:hover{background:rgba(255,255,255,.06);}
   .nav-item.active{background:var(--sub); color:#fff; font-weight:600;}
+  .nav-section-label{font-size:10.5px; font-weight:700; letter-spacing:.03em; color:#5E75AC; padding:16px 12px 6px; }
+  .nav-section-label:first-child{padding-top:2px;}
   .nav-icon{width:18px; text-align:center;}
   .sidebar-foot{margin-top:auto; padding-top:16px; font-size:11px; color:#6B7FB0; border-top:1px solid rgba(255,255,255,.1);}
 
@@ -124,6 +126,54 @@
   .calc-row .v{font-weight:600; color:var(--text); font-variant-numeric:tabular-nums;}
   .calc-row.total{background:#F5F8FF;}
   .calc-row.total .v{color:var(--main); font-size:16px; font-weight:800;}
+
+  /* ── 퇴사 위험도 예측 탭 ── */
+  .risk-wrap{display:grid; grid-template-columns:1.1fr 0.9fr; gap:16px;}
+  @media(max-width:900px){.risk-wrap{grid-template-columns:1fr;}}
+  .risk-field{margin-bottom:16px;}
+  .risk-field label{display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:6px;}
+  .risk-field .risk-val{color:var(--main); font-weight:700;}
+  .risk-field input[type=range]{width:100%; accent-color:var(--main);}
+  .risk-check{display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; padding:9px 0;}
+  .risk-check input{width:16px; height:16px; accent-color:var(--main);}
+  .risk-result-card{text-align:center; padding:24px;}
+  .risk-gauge{position:relative; width:180px; height:180px; margin:0 auto 12px;}
+  .risk-gauge svg{transform:rotate(-90deg);}
+  .risk-gauge-label{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;}
+  .risk-gauge-pct{font-size:32px; font-weight:800;}
+  .risk-gauge-tag{font-size:12px; font-weight:700; margin-top:2px; padding:2px 10px; border-radius:20px; display:inline-block;}
+  .risk-factors{text-align:left; margin-top:20px;}
+  .risk-factors h3{font-size:13px; margin:0 0 10px; color:var(--muted);}
+  .risk-factor-row{display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:8px 0; border-top:1px solid var(--line);}
+  .risk-factor-row:first-of-type{border-top:none;}
+  .risk-factor-bar{flex:1; height:6px; background:#E2E8F0; border-radius:4px; margin:0 10px; overflow:hidden;}
+  .risk-factor-bar-fill{height:100%; border-radius:4px;}
+
+  /* ── 직원경험 데이터 탭 ── */
+  .exp-wrap{display:grid; grid-template-columns:1.1fr 0.9fr; gap:16px; margin-top:14px;}
+  @media(max-width:900px){.exp-wrap{grid-template-columns:1fr;}}
+  .exp-chart{display:flex; align-items:flex-end; gap:6px; height:120px; margin:6px 0 20px;}
+  .exp-bar{flex:1; border-radius:3px 3px 0 0; position:relative;}
+  .exp-bar-label{position:absolute; bottom:-18px; left:0; right:0; text-align:center; font-size:10px; color:var(--muted);}
+  .exp-keyword-row{display:flex; align-items:center; gap:8px; font-size:12px; padding:5px 0;}
+  .exp-keyword-tag{padding:2px 8px; border-radius:12px; font-weight:700; min-width:60px; text-align:center;}
+  .exp-keyword-bar{flex:1; height:6px; background:#E2E8F0; border-radius:4px; overflow:hidden;}
+  .exp-keyword-bar-fill{height:100%;}
+  .exp-dept-row{display:flex; justify-content:space-between; font-size:13px; padding:8px 0; border-top:1px solid var(--line);}
+  .exp-dept-row:first-of-type{border-top:none;}
+  .exp-log{max-height:150px; overflow-y:auto; margin-top:14px; font-size:12px;}
+  .exp-log-item{padding:8px 0; border-top:1px solid var(--line); color:var(--gray-text);}
+  .exp-log-item:first-of-type{border-top:none;}
+  .exp-log-item .exp-tag{font-size:10px; font-weight:700; padding:1px 6px; border-radius:8px; margin-right:6px;}
+
+  /* ── 근태 이상징후 분석 탭 ── */
+  .att-dept-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media(max-width:720px){.att-dept-grid{grid-template-columns:1fr;}}
+  .att-dept-h{font-size:12px; color:var(--muted); margin:0 0 10px;}
+  .att-bar-row{margin-bottom:10px;}
+  .att-bar-label{display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;}
+  .att-bar-track{height:8px; background:#E2E8F0; border-radius:5px; overflow:hidden;}
+  .att-bar-fill{height:100%; border-radius:5px;}
 </style>
 </head>
 <body>
@@ -135,12 +185,24 @@
       <div class="sub">AI 인사총무 어시스턴트</div>
     </div>
     <nav class="nav">
+      <div class="nav-section-label">근태 및 운영</div>
       <div class="nav-item active" data-tab="attendance"><span class="nav-icon">🕘</span> 근태·연차 관리</div>
+
+      <div class="nav-section-label">급여 및 정산</div>
       <div class="nav-item" data-tab="payroll"><span class="nav-icon">💳</span> 급여대장</div>
       <div class="nav-item" data-tab="proration"><span class="nav-icon">🧮</span> 중도입퇴사 일할계산기</div>
-      <div class="nav-item" data-tab="asset"><span class="nav-icon">💻</span> 자산·비품 관리</div>
       <div class="nav-item" data-tab="retirement"><span class="nav-icon">🏦</span> 퇴직금·연금</div>
       <div class="nav-item" data-tab="yearend"><span class="nav-icon">🧾</span> 연말정산·보수총액신고</div>
+
+      <div class="nav-section-label">자산 및 총무</div>
+      <div class="nav-item" data-tab="asset"><span class="nav-icon">💻</span> 자산·비품 관리</div>
+
+      <div class="nav-section-label">피플 인사이트</div>
+      <div class="nav-item" data-tab="turnover"><span class="nav-icon">📉</span> 퇴사 위험도 예측</div>
+      <div class="nav-item" data-tab="experience"><span class="nav-icon">💡</span> 직원경험 데이터</div>
+      <div class="nav-item" data-tab="attrisk"><span class="nav-icon">⏱️</span> 근태 이상징후 분석</div>
+
+      <div class="nav-section-label">지원 서비스</div>
       <div class="nav-item" data-tab="faq"><span class="nav-icon">💬</span> 사내규정 FAQ 챗봇</div>
     </nav>
     <div class="sidebar-foot">전 데이터는 브라우저 메모리에서만<br/>처리되며 서버로 전송되지 않습니다.</div>
@@ -248,27 +310,6 @@
       </div>
     </section>
 
-    <!-- 자산·비품 -->
-    <section id="tab-asset" class="tab-panel">
-      <div class="stats-row" id="assetStats"></div>
-      <div class="panel" style="margin-top:14px;">
-        <div class="panel-note">사용자(이름)는 사용자 사번을 근태 탭 임직원 명단과 매칭해 자동으로 표시됩니다. 사용자가 지정되지 않은 자산은 "미사용(재고)"로 집계됩니다. 교체예정일이 지났거나 미반납 상태면 "확인필요"로 표시됩니다.</div>
-        <div class="toolbar">
-          <label>자산종류 필터</label>
-          <select id="assetFilter"></select>
-        </div>
-        <div class="table-scroll">
-          <table>
-            <thead><tr>
-              <th>자산번호</th><th>자산종류</th><th>모델명</th><th>지급일자</th><th>사용자</th>
-              <th>사용자(이름)</th><th>교체주기(개월)</th><th>교체예정일</th><th>교체도래</th><th>반납여부</th><th>상태</th>
-            </tr></thead>
-            <tbody id="assetBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
     <!-- 퇴직금·연금 -->
     <section id="tab-retirement" class="tab-panel">
       <div class="panel">
@@ -322,6 +363,177 @@
             </tr></thead>
             <tbody id="remunerationBody"></tbody>
           </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 자산·비품 -->
+    <section id="tab-asset" class="tab-panel">
+      <div class="stats-row" id="assetStats"></div>
+      <div class="panel" style="margin-top:14px;">
+        <div class="panel-note">사용자(이름)는 사용자 사번을 근태 탭 임직원 명단과 매칭해 자동으로 표시됩니다. 사용자가 지정되지 않은 자산은 "미사용(재고)"로 집계됩니다. 교체예정일이 지났거나 미반납 상태면 "확인필요"로 표시됩니다.</div>
+        <div class="toolbar">
+          <label>자산종류 필터</label>
+          <select id="assetFilter"></select>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th>자산번호</th><th>자산종류</th><th>모델명</th><th>지급일자</th><th>사용자</th>
+              <th>사용자(이름)</th><th>교체주기(개월)</th><th>교체예정일</th><th>교체도래</th><th>반납여부</th><th>상태</th>
+            </tr></thead>
+            <tbody id="assetBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 퇴사 위험도 예측 -->
+    <section id="tab-turnover" class="tab-panel">
+      <div class="panel-note">
+        가상 직원 800명 데이터로 로지스틱 회귀(Scikit-learn)를 학습시켜 산출한 가중치를 그대로 이식한 계산기입니다.
+        AUC 0.87 수준으로 검증했으며, <b>야근시간 증가</b>와 <b>평가등급 하락</b>이 가장 강한 퇴사 신호로 확인됐습니다. 슬라이더를 조정하면 위험도가 실시간으로 재계산됩니다.
+      </div>
+      <div class="risk-wrap">
+        <div class="panel" style="margin-top:14px; padding:22px;">
+          <div class="risk-field">
+            <label>근속연수 <span class="risk-val" id="rv-tenure">3.0년</span></label>
+            <input type="range" id="r-tenure" min="0.2" max="15" step="0.1" value="3">
+          </div>
+          <div class="risk-field">
+            <label>최근 3개월 야근시간 증감 정도 <span class="risk-val" id="rv-overtime">보통</span></label>
+            <input type="range" id="r-overtime" min="-3" max="3" step="0.5" value="0">
+          </div>
+          <div class="risk-field">
+            <label>연차 사용률 <span class="risk-val" id="rv-leave">50%</span></label>
+            <input type="range" id="r-leave" min="0" max="100" step="1" value="50">
+          </div>
+          <div class="risk-field">
+            <label>최근 평가등급 변화 <span class="risk-val" id="rv-eval">변동 없음</span></label>
+            <input type="range" id="r-evalscore" min="-3" max="3" step="0.5" value="0">
+          </div>
+          <div class="risk-field">
+            <label>최근 급여 인상률 <span class="risk-val" id="rv-salary">3.0%</span></label>
+            <input type="range" id="r-salary" min="-5" max="15" step="0.5" value="3">
+          </div>
+          <div class="risk-field">
+            <label>출퇴근 거리 <span class="risk-val" id="rv-commute">8km</span></label>
+            <input type="range" id="r-commute" min="0.5" max="50" step="0.5" value="8">
+          </div>
+          <div class="risk-check">
+            <input type="checkbox" id="r-leaveSplit">
+            <label for="r-leaveSplit">최근 연차를 금요일/월요일에 붙여 사용한 적 있음</label>
+          </div>
+          <div class="risk-check">
+            <input type="checkbox" id="r-managerChange">
+            <label for="r-managerChange">최근 6개월 내 담당 매니저 변경 있음</label>
+          </div>
+        </div>
+
+        <div class="panel risk-result-card" style="margin-top:14px;">
+          <div class="risk-gauge">
+            <svg width="180" height="180" viewBox="0 0 180 180">
+              <circle cx="90" cy="90" r="78" fill="none" stroke="#E2E8F0" stroke-width="14"/>
+              <circle id="riskGaugeArc" cx="90" cy="90" r="78" fill="none" stroke="#1E40AF"
+                      stroke-width="14" stroke-linecap="round"
+                      stroke-dasharray="490" stroke-dashoffset="490"/>
+            </svg>
+            <div class="risk-gauge-label">
+              <div class="risk-gauge-pct" id="riskPct">--%</div>
+              <div class="risk-gauge-tag" id="riskTag">계산 중</div>
+            </div>
+          </div>
+          <div class="risk-factors">
+            <h3>주요 영향 요인 (Top 3)</h3>
+            <div id="riskFactorList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 직원경험 데이터 -->
+    <section id="tab-experience" class="tab-panel">
+      <div class="panel-note">
+        매주 짧은 펄스 서베이 응답을 코멘트 키워드 기반으로 감정 점수화해, 별도 시스템 도입 없이도 조직의 몰입도 흐름을 데이터로 관리합니다.
+      </div>
+      <div class="stats-row" style="margin-top:14px;">
+        <div class="stat-card"><div class="label">이번 주 평균 몰입도</div><div class="value" id="expScore">--</div></div>
+        <div class="stat-card warn"><div class="label">부정 키워드 언급률</div><div class="value" id="expNeg">--%</div></div>
+        <div class="stat-card"><div class="label">전사 eNPS(추정)</div><div class="value" id="expEnps">--</div></div>
+        <div class="stat-card muted"><div class="label">3개월 내 조기이탈률</div><div class="value">4.2%</div></div>
+      </div>
+      <div class="exp-wrap">
+        <div class="panel" style="padding:20px;">
+          <div class="section-title" style="padding:0 0 12px;">이번 주 펄스 서베이 응답</div>
+          <label style="font-size:12px; font-weight:700; color:var(--muted); display:block; margin-bottom:6px;">이번 주 업무 몰입도는 어땠나요?</label>
+          <select id="expRating" style="width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:8px; margin-bottom:12px;">
+            <option value="5">5 - 매우 좋음</option>
+            <option value="4">4 - 좋음</option>
+            <option value="3" selected>3 - 보통</option>
+            <option value="2">2 - 별로</option>
+            <option value="1">1 - 힘듦</option>
+          </select>
+          <label style="font-size:12px; font-weight:700; color:var(--muted); display:block; margin-bottom:6px;">자유롭게 이유를 적어주세요 (선택)</label>
+          <textarea id="expComment" rows="3" placeholder="예: 요즘 업무량이 많아서 조금 힘들지만, 팀 분위기는 좋아요"
+            style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; font-size:13px; font-family:inherit; resize:vertical;"></textarea>
+          <button class="btn btn-primary" style="margin-top:10px; width:100%; justify-content:center;" id="expSubmitBtn">응답 제출</button>
+          <div class="exp-log" id="expLog"></div>
+        </div>
+        <div class="panel" style="padding:20px;">
+          <div class="section-title" style="padding:0 0 12px;">8주 몰입도 추이</div>
+          <div class="exp-chart" id="expTrendChart"></div>
+          <div class="section-title" style="padding:20px 0 12px;">코멘트 키워드 Top 5</div>
+          <div id="expKeywordList"></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px; padding:20px;">
+        <div class="section-title" style="padding:0 0 12px;">부서별 eNPS 비교</div>
+        <div id="expDeptList"></div>
+      </div>
+    </section>
+
+    <!-- 근태 이상징후 분석 -->
+    <section id="tab-attrisk" class="tab-panel">
+      <div class="panel-note">
+        근태·연차 관리 탭 임직원 기준 16주 근태 데이터를 pandas로 분석한 결과입니다. 주당 연장근로 10시간 초과가 3주 이상 연속되면 <b>번아웃 위험군</b>으로, 연차를 금·월요일에 몰아 쓰는 패턴이 반복되면 <b>이탈 징후</b>로 표시합니다.
+      </div>
+      <div class="stats-row" style="margin-top:14px;">
+        <div class="stat-card"><div class="label">분석 대상 인원</div><div class="value" id="attTotal">--</div></div>
+        <div class="stat-card warn"><div class="label">번아웃 위험군 비율</div><div class="value" id="attBurnoutRate">--%</div></div>
+        <div class="stat-card warn"><div class="label">이탈 징후 감지 인원</div><div class="value" id="attExitCount">--</div></div>
+      </div>
+
+      <div class="panel" style="margin-top:14px;">
+        <div class="section-title">번아웃 위험군</div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>사번</th><th>이름</th><th>부서</th><th>최대 연속 고위험주</th><th>평균 연장근로시간</th><th>위험도</th></tr></thead>
+            <tbody id="attBurnoutBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:14px;">
+        <div class="section-title">이탈 징후 패턴</div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>사번</th><th>이름</th><th>부서</th><th>연차 사용 횟수</th><th>금·월요일 집중 비율</th></tr></thead>
+            <tbody id="attExitBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:14px; padding:20px;">
+        <div class="section-title" style="padding:0 0 14px;">부서별 몰입도 지표</div>
+        <div class="att-dept-grid">
+          <div>
+            <h3 class="att-dept-h">평균 정시출근율</h3>
+            <div id="attDeptOnTime"></div>
+          </div>
+          <div>
+            <h3 class="att-dept-h">평균 주당 연장근로시간</h3>
+            <div id="attDeptOvertime"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -742,6 +954,9 @@ const tabInfo = {
   retirement: {title:"퇴직금·연금", desc:"입사일 기준 근속연수로 퇴직금 추정액과 DC형 퇴직연금 연간 적립액을 계산합니다."},
   yearend:    {title:"연말정산·보수총액신고", desc:"1년치 소득세 정산(연말정산)과 고용·산재보험료 정산(보수총액신고)을 추정합니다."},
   faq:        {title:"사내규정 FAQ 챗봇", desc:"연차·경조사비·비품 신청 등 자주 묻는 질문에 키워드 매칭으로 답변하는 데모입니다."},
+  turnover:   {title:"퇴사 위험도 예측", desc:"근태·평가·보상 데이터를 로지스틱 회귀 모델(Scikit-learn)에 학습시켜 산출한 가중치로 퇴사 위험도를 계산합니다."},
+  experience: {title:"직원경험 데이터", desc:"매주 펄스 서베이 응답을 키워드 기반으로 감정 분석해, 조직의 몰입도 흐름을 데이터로 관리합니다."},
+  attrisk:    {title:"근태 이상징후 분석", desc:"12~16주 근태 데이터를 분석해 번아웃 위험군과 이탈 징후 패턴을 자동으로 탐지합니다."},
 };
 document.querySelectorAll(".nav-item").forEach(item => {
   item.addEventListener("click", () => {
@@ -1091,7 +1306,252 @@ function initFaqChat(){
 initFaqChat();
 
 /* ══════════════════════════════════════════════════════════
-   14. 초기 렌더링
+   14. 퇴사 위험도 예측 (로지스틱 회귀 가중치 이식)
+   ══════════════════════════════════════════════════════════ */
+// Python(pandas/scikit-learn)으로 가상 직원 800명 데이터를 학습시킨 로지스틱 회귀 결과 가중치
+// (AUC 0.866 / turnover_prediction.py 산출)
+const RISK_WEIGHTS = {
+  tenure:        -0.0252,
+  overtime:       1.1592,
+  leave:         -1.6907,
+  leaveSplit:     1.3252,
+  evalscore:     -0.9412,
+  salary:        -3.9577,
+  commute:        0.0322,
+  managerChange:  0.2188,
+  intercept:     -1.8242
+};
+const RISK_FACTOR_LABEL = {
+  tenure:"근속연수", overtime:"최근 야근시간 증가", leave:"연차 사용률",
+  leaveSplit:"연차 금/월요일 몰아쓰기", evalscore:"평가등급 변화",
+  salary:"급여 인상률", commute:"출퇴근 거리", managerChange:"매니저 변경"
+};
+const riskEls = {
+  tenure: document.getElementById('r-tenure'), overtime: document.getElementById('r-overtime'),
+  leave: document.getElementById('r-leave'), evalscore: document.getElementById('r-evalscore'),
+  salary: document.getElementById('r-salary'), commute: document.getElementById('r-commute'),
+  leaveSplit: document.getElementById('r-leaveSplit'), managerChange: document.getElementById('r-managerChange'),
+};
+const riskSigmoid = x => 1/(1+Math.exp(-x));
+const overtimeLabel = v => v<=-2?"대폭 감소":v<0?"감소":v===0?"보통":v<2?"증가":"대폭 증가";
+const evalScoreLabel = v => v<=-2?"크게 하락":v<0?"하락":v===0?"변동 없음":v<2?"상승":"크게 상승";
+
+function computeRisk(){
+  const tenure = parseFloat(riskEls.tenure.value);
+  const overtime = parseFloat(riskEls.overtime.value);
+  const leaveRate = parseFloat(riskEls.leave.value)/100;
+  const evalscore = parseFloat(riskEls.evalscore.value);
+  const salaryRate = parseFloat(riskEls.salary.value)/100;
+  const commute = parseFloat(riskEls.commute.value);
+  const leaveSplit = riskEls.leaveSplit.checked ? 1 : 0;
+  const managerChange = riskEls.managerChange.checked ? 1 : 0;
+
+  document.getElementById('rv-tenure').textContent = tenure.toFixed(1)+"년";
+  document.getElementById('rv-overtime').textContent = overtimeLabel(overtime);
+  document.getElementById('rv-leave').textContent = Math.round(leaveRate*100)+"%";
+  document.getElementById('rv-eval').textContent = evalScoreLabel(evalscore);
+  document.getElementById('rv-salary').textContent = (salaryRate*100).toFixed(1)+"%";
+  document.getElementById('rv-commute').textContent = commute.toFixed(1)+"km";
+
+  const contributions = {
+    tenure: RISK_WEIGHTS.tenure*tenure, overtime: RISK_WEIGHTS.overtime*overtime,
+    leave: RISK_WEIGHTS.leave*leaveRate, leaveSplit: RISK_WEIGHTS.leaveSplit*leaveSplit,
+    evalscore: RISK_WEIGHTS.evalscore*evalscore, salary: RISK_WEIGHTS.salary*salaryRate,
+    commute: RISK_WEIGHTS.commute*commute, managerChange: RISK_WEIGHTS.managerChange*managerChange,
+  };
+  const logit = RISK_WEIGHTS.intercept + Object.values(contributions).reduce((a,b)=>a+b,0);
+  const risk = riskSigmoid(logit);
+  const pct = Math.round(risk*100);
+  document.getElementById('riskPct').textContent = pct+"%";
+
+  const tag = document.getElementById('riskTag');
+  let tagText, tagBg, tagColor, arcColor;
+  if(pct<25){tagText="위험도 낮음"; tagBg="#DCFCE7"; tagColor="#16A34A"; arcColor="#16A34A";}
+  else if(pct<50){tagText="위험도 보통"; tagBg="#FEF3C7"; tagColor="#D97706"; arcColor="#D97706";}
+  else if(pct<75){tagText="위험도 높음"; tagBg="#FFEDD5"; tagColor="#EA580C"; arcColor="#EA580C";}
+  else {tagText="위험도 매우 높음"; tagBg="#FEE2E2"; tagColor="#DC2626"; arcColor="#DC2626";}
+  tag.textContent = tagText; tag.style.background = tagBg; tag.style.color = tagColor;
+
+  const arc = document.getElementById('riskGaugeArc');
+  const circumference = 2*Math.PI*78*(270/360);
+  arc.setAttribute('stroke-dasharray', circumference);
+  arc.setAttribute('stroke-dashoffset', circumference*(1-risk));
+  arc.setAttribute('stroke', arcColor);
+
+  const sorted = Object.entries(contributions).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,3);
+  const maxAbs = Math.max(...sorted.map(([,v])=>Math.abs(v)), 0.001);
+  document.getElementById('riskFactorList').innerHTML = sorted.map(([key,val])=>{
+    const widthPct = Math.min(100, Math.abs(val)/maxAbs*100);
+    const arrow = val>0 ? '▲ 위험 증가' : '▼ 위험 감소';
+    const color = val>0 ? '#DC2626' : '#16A34A';
+    return `<div class="risk-factor-row">
+      <span>${RISK_FACTOR_LABEL[key]}</span>
+      <span class="risk-factor-bar"><span class="risk-factor-bar-fill" style="width:${widthPct}%; background:${color};"></span></span>
+      <span style="color:${color}; font-weight:700;">${arrow}</span>
+    </div>`;
+  }).join('');
+}
+Object.values(riskEls).forEach(el => el.addEventListener('input', computeRisk));
+computeRisk();
+
+/* ══════════════════════════════════════════════════════════
+   15. 직원경험 데이터 (펄스 서베이 + 키워드 감정분석)
+   ══════════════════════════════════════════════════════════ */
+const EXP_POSITIVE = ["좋다","좋아요","만족","성장","보람","배움","재미","협업","칭찬","도움","편하다","즐겁다"];
+const EXP_NEGATIVE = ["힘들다","힘들어","번아웃","이직","스트레스","과부하","답답","야근","불만","피곤","지친다","부담"];
+function expSentiment(text){
+  if(!text) return 0;
+  let pos=0, neg=0;
+  EXP_POSITIVE.forEach(w=>{ if(text.includes(w)) pos++; });
+  EXP_NEGATIVE.forEach(w=>{ if(text.includes(w)) neg++; });
+  const total = pos+neg;
+  return total===0 ? 0 : (pos-neg)/total;
+}
+let expHistory = [
+  {week:"1주차", rating:3.8, comments:["팀 분위기 좋아요","업무량 보통"]},
+  {week:"2주차", rating:3.6, comments:["약간 바빴지만 괜찮음","성장하는 느낌"]},
+  {week:"3주차", rating:3.2, comments:["야근이 늘어서 힘들다","프로젝트 마감 압박"]},
+  {week:"4주차", rating:2.9, comments:["번아웃 오는 것 같음","스트레스 받는 중"]},
+  {week:"5주차", rating:3.1, comments:["조금 나아짐","여전히 바쁨"]},
+  {week:"6주차", rating:3.7, comments:["협업이 잘 되어 만족","보람 있었음"]},
+  {week:"7주차", rating:3.9, comments:["칭찬 받아서 기분 좋음","편하게 일함"]},
+  {week:"8주차", rating:3.5, comments:["업무 배분 만족","가끔 답답함"]},
+];
+// 근태·연차 관리 탭과 동일한 5개 실제 부서 기준 eNPS 샘플
+const expDeptData = [
+  {name:"연구개발팀", enps: 28}, {name:"영업팀", enps: 9},
+  {name:"인사총무팀", enps: 24}, {name:"품질관리팀", enps: 17},
+  {name:"경영지원팀", enps: 30},
+];
+function renderExpTrend(){
+  const el = document.getElementById('expTrendChart');
+  el.innerHTML = expHistory.map(h=>{
+    const h_px = (h.rating/5*100).toFixed(0);
+    const color = h.rating>=3.5 ? '#3B82F6' : (h.rating>=3.0 ? '#94A3B8' : '#DC2626');
+    return `<div style="flex:1; position:relative;">
+      <div class="exp-bar" style="height:${h_px}px; background:${color};"></div>
+      <div class="exp-bar-label">${h.week}</div>
+    </div>`;
+  }).join('');
+}
+function renderExpKeywords(){
+  const freq = {};
+  expHistory.forEach(h=>h.comments.forEach(c=>{
+    [...EXP_POSITIVE, ...EXP_NEGATIVE].forEach(w=>{ if(c.includes(w)) freq[w]=(freq[w]||0)+1; });
+  }));
+  const sorted = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxCount = Math.max(...sorted.map(([,c])=>c), 1);
+  document.getElementById('expKeywordList').innerHTML = sorted.map(([word,count])=>{
+    const isNeg = EXP_NEGATIVE.includes(word);
+    const tagBg = isNeg ? '#FEE2E2' : '#DCFCE7';
+    const textColor = isNeg ? '#DC2626' : '#16A34A';
+    return `<div class="exp-keyword-row">
+      <span class="exp-keyword-tag" style="background:${tagBg}; color:${textColor};">${word}</span>
+      <span class="exp-keyword-bar"><span class="exp-keyword-bar-fill" style="width:${count/maxCount*100}%; background:${textColor};"></span></span>
+      <span>${count}회</span>
+    </div>`;
+  }).join('') || '<div style="font-size:12px; color:#94A3B8;">아직 응답이 부족해요.</div>';
+}
+function renderExpDept(){
+  document.getElementById('expDeptList').innerHTML = expDeptData.map(d=>{
+    const color = d.enps>=20 ? '#16A34A' : (d.enps>=10 ? '#D97706' : '#DC2626');
+    return `<div class="exp-dept-row"><span>${d.name}</span><span style="font-weight:700; color:${color};">${d.enps}</span></div>`;
+  }).join('');
+}
+function renderExpLog(){
+  const recent = [...expHistory].slice(-4).reverse();
+  document.getElementById('expLog').innerHTML = recent.map(h=>{
+    return h.comments.map(c=>{
+      const s = expSentiment(c);
+      const tag = s>0.2?'긍정':(s<-0.2?'부정':'중립');
+      const tagColor = s>0.2?'#16A34A':(s<-0.2?'#DC2626':'#94A3B8');
+      return `<div class="exp-log-item"><span class="exp-tag" style="background:${tagColor}22; color:${tagColor};">${tag}</span>${c} <span style="color:#94A3B8;">(${h.week})</span></div>`;
+    }).join('');
+  }).join('');
+}
+function updateExpKPI(){
+  const avgRating = expHistory.reduce((s,h)=>s+h.rating,0)/expHistory.length;
+  const allComments = expHistory.flatMap(h=>h.comments);
+  const negRate = Math.round(allComments.filter(c=>expSentiment(c)<-0.2).length/allComments.length*100);
+  const enpsAvg = Math.round(expDeptData.reduce((s,d)=>s+d.enps,0)/expDeptData.length);
+  document.getElementById('expScore').textContent = avgRating.toFixed(1);
+  document.getElementById('expNeg').textContent = negRate+"%";
+  document.getElementById('expEnps').textContent = enpsAvg;
+}
+function renderExpAll(){ renderExpTrend(); renderExpKeywords(); renderExpDept(); renderExpLog(); updateExpKPI(); }
+document.getElementById('expSubmitBtn').addEventListener('click', () => {
+  const rating = parseFloat(document.getElementById('expRating').value);
+  const comment = document.getElementById('expComment').value.trim();
+  const weekNum = expHistory.length + 1;
+  expHistory.push({week: weekNum+"주차", rating, comments: comment?[comment]:[]});
+  if(expHistory.length > 8) expHistory.shift();
+  document.getElementById('expComment').value = '';
+  renderExpAll();
+});
+renderExpAll();
+
+/* ══════════════════════════════════════════════════════════
+   16. 근태 이상징후 분석 (번아웃 위험군 / 이탈 징후 / 몰입도)
+   ══════════════════════════════════════════════════════════ */
+// Python(pandas)으로 근태·연차 관리 탭 임직원 기준 16주 근태 데이터를 분석한 결과(attendance_analysis.py)
+const ATT_DATA = {
+  total_employees: 10,
+  burnout_rate_pct: 20.0,
+  burnout_risk: [
+    {"사번":"EMP001","이름":"김서준","부서":"인사총무팀","최대_연속_고위험주":4,"평균_연장근로시간":7.4},
+    {"사번":"EMP008","이름":"윤아린","부서":"품질관리팀","최대_연속_고위험주":3,"평균_연장근로시간":7.2}
+  ],
+  exit_signal: [
+    {"사번":"EMP007","이름":"조유준","부서":"품질관리팀","연차사용횟수":3,"금월요일_비율":1.00},
+    {"사번":"EMP005","이름":"정민준","부서":"영업팀","연차사용횟수":4,"금월요일_비율":0.75}
+  ],
+  dept_summary: [
+    {"부서":"인사총무팀","평균_정시출근율":0.919,"평균_연장근로시간":7.412},
+    {"부서":"품질관리팀","평균_정시출근율":0.910,"평균_연장근로시간":4.825},
+    {"부서":"연구개발팀","평균_정시출근율":0.908,"평균_연장근로시간":6.321},
+    {"부서":"영업팀","평균_정시출근율":0.907,"평균_연장근로시간":6.247},
+    {"부서":"경영지원팀","평균_정시출근율":0.887,"평균_연장근로시간":3.006}
+  ]
+};
+function attRiskBadge(streak){
+  return streak>=6 ? `<span class="badge badge-warn">매우 높음</span>` : `<span class="badge badge-warn" style="background:#FFEDD5; color:#EA580C;">주의</span>`;
+}
+function renderAttBurnout(){
+  document.getElementById('attBurnoutBody').innerHTML = ATT_DATA.burnout_risk.map(r=>`
+    <tr><td>${r.사번}</td><td class="name-cell">${r.이름}</td><td>${r.부서}</td>
+      <td>${r.최대_연속_고위험주}주</td><td class="num">${r.평균_연장근로시간}시간</td><td>${attRiskBadge(r.최대_연속_고위험주)}</td></tr>`).join('');
+}
+function renderAttExit(){
+  document.getElementById('attExitBody').innerHTML = ATT_DATA.exit_signal.map(r=>`
+    <tr><td>${r.사번}</td><td class="name-cell">${r.이름}</td><td>${r.부서}</td>
+      <td>${r.연차사용횟수}회</td><td class="num">${Math.round(r.금월요일_비율*100)}%</td></tr>`).join('');
+}
+function renderAttDept(){
+  const maxOvertime = Math.max(...ATT_DATA.dept_summary.map(d=>d.평균_연장근로시간));
+  document.getElementById('attDeptOnTime').innerHTML = ATT_DATA.dept_summary.slice()
+    .sort((a,b)=>b.평균_정시출근율-a.평균_정시출근율).map(d=>`
+    <div class="att-bar-row">
+      <div class="att-bar-label"><span>${d.부서}</span><span>${(d.평균_정시출근율*100).toFixed(1)}%</span></div>
+      <div class="att-bar-track"><div class="att-bar-fill" style="width:${d.평균_정시출근율*100}%; background:#3B82F6;"></div></div>
+    </div>`).join('');
+  document.getElementById('attDeptOvertime').innerHTML = ATT_DATA.dept_summary.slice()
+    .sort((a,b)=>b.평균_연장근로시간-a.평균_연장근로시간).map(d=>{
+      const isMax = d.평균_연장근로시간===maxOvertime;
+      return `<div class="att-bar-row">
+      <div class="att-bar-label"><span>${d.부서}</span><span>${d.평균_연장근로시간}시간</span></div>
+      <div class="att-bar-track"><div class="att-bar-fill" style="width:${d.평균_연장근로시간/maxOvertime*100}%; background:${isMax?'#DC2626':'#1E40AF'};"></div></div>
+    </div>`;}).join('');
+}
+function initAttRisk(){
+  document.getElementById('attTotal').textContent = ATT_DATA.total_employees+"명";
+  document.getElementById('attBurnoutRate').textContent = ATT_DATA.burnout_rate_pct+"%";
+  document.getElementById('attExitCount').textContent = ATT_DATA.exit_signal.length+"명";
+  renderAttBurnout(); renderAttExit(); renderAttDept();
+}
+initAttRisk();
+
+/* ══════════════════════════════════════════════════════════
+   17. 초기 렌더링
    ══════════════════════════════════════════════════════════ */
 renderAll();
 </script>

@@ -19,12 +19,17 @@
   .brand{padding:0 8px 28px; border-bottom:1px solid rgba(255,255,255,.12); margin-bottom:20px;}
   .brand .logo{font-size:17px; font-weight:700;}
   .brand .sub{font-size:12px; color:#93A5D1; margin-top:4px;}
-  .nav{display:flex; flex-direction:column; gap:4px;}
+  .nav{display:flex; flex-direction:column;}
+  .nav-group{margin-bottom:2px;}
+  .nav-items{display:flex; flex-direction:column; gap:4px; overflow:hidden;}
+  .nav-group.collapsed .nav-items{display:none;}
   .nav-item{display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:8px; color:#C7D2E8; font-size:14px; cursor:pointer; transition:.15s;}
   .nav-item:hover{background:rgba(255,255,255,.06);}
   .nav-item.active{background:var(--sub); color:#fff; font-weight:600;}
-  .nav-section-label{font-size:10.5px; font-weight:700; letter-spacing:.03em; color:#5E75AC; padding:16px 12px 6px; }
-  .nav-section-label:first-child{padding-top:2px;}
+  .nav-section-label{font-size:10.5px; font-weight:700; letter-spacing:.03em; color:#5E75AC; padding:16px 12px 6px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; user-select:none;}
+  .nav-group:first-child .nav-section-label{padding-top:2px;}
+  .nav-chevron{font-size:9px; color:#5E75AC; transition:transform .18s;}
+  .nav-group.collapsed .nav-chevron{transform:rotate(-90deg);}
   .nav-icon{width:18px; text-align:center;}
   .sidebar-foot{margin-top:auto; padding-top:16px; font-size:11px; color:#6B7FB0; border-top:1px solid rgba(255,255,255,.1);}
 
@@ -185,25 +190,46 @@
       <div class="sub">AI 인사총무 어시스턴트</div>
     </div>
     <nav class="nav">
-      <div class="nav-section-label">근태 및 운영</div>
-      <div class="nav-item active" data-tab="attendance"><span class="nav-icon">🕘</span> 근태·연차 관리</div>
+      <div class="nav-group">
+        <div class="nav-section-label"><span>근태 및 운영</span><span class="nav-chevron">▾</span></div>
+        <div class="nav-items">
+          <div class="nav-item active" data-tab="attendance"><span class="nav-icon">🕘</span> 근태·연차 관리</div>
+        </div>
+      </div>
 
-      <div class="nav-section-label">급여 및 정산</div>
-      <div class="nav-item" data-tab="payroll"><span class="nav-icon">💳</span> 급여대장</div>
-      <div class="nav-item" data-tab="proration"><span class="nav-icon">🧮</span> 중도입퇴사 일할계산기</div>
-      <div class="nav-item" data-tab="retirement"><span class="nav-icon">🏦</span> 퇴직금·연금</div>
-      <div class="nav-item" data-tab="yearend"><span class="nav-icon">🧾</span> 연말정산·보수총액신고</div>
+      <div class="nav-group">
+        <div class="nav-section-label"><span>급여 및 정산</span><span class="nav-chevron">▾</span></div>
+        <div class="nav-items">
+          <div class="nav-item" data-tab="payroll"><span class="nav-icon">💳</span> 급여대장</div>
+          <div class="nav-item" data-tab="proration"><span class="nav-icon">🧮</span> 중도입퇴사 일할계산기</div>
+          <div class="nav-item" data-tab="retirement"><span class="nav-icon">🏦</span> 퇴직금·연금</div>
+          <div class="nav-item" data-tab="yearend"><span class="nav-icon">🧾</span> 연말정산·보수총액신고</div>
+        </div>
+      </div>
 
-      <div class="nav-section-label">자산 및 총무</div>
-      <div class="nav-item" data-tab="asset"><span class="nav-icon">💻</span> 자산·비품 관리</div>
+      <div class="nav-group">
+        <div class="nav-section-label"><span>자산 및 총무</span><span class="nav-chevron">▾</span></div>
+        <div class="nav-items">
+          <div class="nav-item" data-tab="asset"><span class="nav-icon">💻</span> 자산·비품 관리</div>
+        </div>
+      </div>
 
-      <div class="nav-section-label">피플 인사이트</div>
-      <div class="nav-item" data-tab="turnover"><span class="nav-icon">📉</span> 퇴사 위험도 예측</div>
-      <div class="nav-item" data-tab="experience"><span class="nav-icon">💡</span> 직원경험 데이터</div>
-      <div class="nav-item" data-tab="attrisk"><span class="nav-icon">⏱️</span> 근태 이상징후 분석</div>
+      <div class="nav-group">
+        <div class="nav-section-label"><span>피플 인사이트</span><span class="nav-chevron">▾</span></div>
+        <div class="nav-items">
+          <div class="nav-item" data-tab="evaluation"><span class="nav-icon">🎯</span> 인사평가 관리</div>
+          <div class="nav-item" data-tab="turnover"><span class="nav-icon">📉</span> 퇴사 위험도 예측</div>
+          <div class="nav-item" data-tab="experience"><span class="nav-icon">💡</span> 직원경험 데이터</div>
+          <div class="nav-item" data-tab="attrisk"><span class="nav-icon">⏱️</span> 근태 이상징후 분석</div>
+        </div>
+      </div>
 
-      <div class="nav-section-label">지원 서비스</div>
-      <div class="nav-item" data-tab="faq"><span class="nav-icon">💬</span> 사내규정 FAQ 챗봇</div>
+      <div class="nav-group">
+        <div class="nav-section-label"><span>지원 서비스</span><span class="nav-chevron">▾</span></div>
+        <div class="nav-items">
+          <div class="nav-item" data-tab="faq"><span class="nav-icon">💬</span> 사내규정 FAQ 챗봇</div>
+        </div>
+      </div>
     </nav>
     <div class="sidebar-foot">전 데이터는 브라우저 메모리에서만<br/>처리되며 서버로 전송되지 않습니다.</div>
   </aside>
@@ -385,6 +411,34 @@
             <tbody id="assetBody"></tbody>
           </table>
         </div>
+      </div>
+    </section>
+
+    <!-- 인사평가 관리 -->
+    <section id="tab-evaluation" class="tab-panel">
+      <div class="panel-note">
+        <b>종합점수</b> = 목표달성도 60% + 역량평가 40%로 계산하며, 90점 이상 <b>S</b>, 80점 이상 <b>A</b>, 70점 이상 <b>B</b>, 60점 이상 <b>C</b>, 그 미만은 <b>D</b> 등급으로 자동 환산합니다.
+        이 등급 체계는 [퇴사 위험도 예측] 탭의 "최근 평가등급 변화" 입력 기준과 동일하게 맞췄습니다. 목표달성도·역량평가 점수를 수정하면 종합점수·등급·등급변동이 즉시 다시 계산됩니다.
+      </div>
+      <div class="stats-row" style="margin-top:14px;">
+        <div class="stat-card"><div class="label">전사 평균 종합점수</div><div class="value" id="evalAvgScore">--</div></div>
+        <div class="stat-card"><div class="label">S+A 등급 비율</div><div class="value" id="evalTopRate">--%</div></div>
+        <div class="stat-card muted"><div class="label">전기 대비 등급 상승 인원</div><div class="value" id="evalUpCount">--</div></div>
+      </div>
+      <div class="panel" style="margin-top:14px;">
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th>사번</th><th>이름</th><th>부서</th><th>평가기간</th><th>목표달성도(점)</th><th>역량평가(점)</th>
+              <th>종합점수</th><th>종합등급</th><th>전기등급</th><th>등급변동</th><th>평가 코멘트</th>
+            </tr></thead>
+            <tbody id="evaluationBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px; padding:20px;">
+        <div class="section-title" style="padding:0 0 14px;">등급 분포</div>
+        <div id="evalDistChart"></div>
       </div>
     </section>
 
@@ -630,6 +684,20 @@ let assets = [
   {assetNo:"IT-010", kind:"모니터", model:"LG 24인치 FHD",   issueDate:"2024-02-15", userId:"",       cycle:60, returned:"재고"},
   {assetNo:"IT-011", kind:"태블릿", model:"갤럭시탭 S9",     issueDate:"2024-05-10", userId:"",       cycle:24, returned:"재고"},
 ];
+
+let evaluations = [
+  {empId:"EMP001", period:"2026년 상반기", goalScore:88, competencyScore:85, prevGrade:"B", comment:"정산 프로세스 자동화 주도, 신입 온보딩 지원 우수"},
+  {empId:"EMP002", period:"2026년 상반기", goalScore:76, competencyScore:80, prevGrade:"B", comment:"신규 업무 적응 양호, 커뮤니케이션 보완 필요"},
+  {empId:"EMP003", period:"2026년 상반기", goalScore:95, competencyScore:91, prevGrade:"A", comment:"핵심 R&D 마일스톤 조기 달성"},
+  {empId:"EMP004", period:"2026년 상반기", goalScore:68, competencyScore:72, prevGrade:"B", comment:"과제 진척 다소 지연, 성장 잠재력 있음"},
+  {empId:"EMP005", period:"2026년 상반기", goalScore:83, competencyScore:79, prevGrade:"B", comment:"영업 목표 근접 달성, 팀 리딩 역량 양호"},
+  {empId:"EMP006", period:"2026년 상반기", goalScore:90, competencyScore:86, prevGrade:"B", comment:"신규 거래처 발굴 성과 우수"},
+  {empId:"EMP007", period:"2026년 상반기", goalScore:60, competencyScore:65, prevGrade:"C", comment:"품질 이슈 대응 지연, 개선 필요"},
+  {empId:"EMP008", period:"2026년 상반기", goalScore:79, competencyScore:81, prevGrade:"B", comment:"품질 검수 프로세스 정착에 기여"},
+  {empId:"EMP009", period:"2026년 상반기", goalScore:97, competencyScore:93, prevGrade:"A", comment:"경영지원 총괄 리더십 우수, 조직 안정화 기여"},
+  {empId:"EMP010", period:"2026년 상반기", goalScore:71, competencyScore:74, prevGrade:"C", comment:"기본기 탄탄, 심화 과제 경험 필요"},
+];
+const EVAL_GRADE_ORDER = {S:5, A:4, B:3, C:2, D:1};
 
 let retirementTypes = {};
 const SAJAE_RATE = 0.007; // 산재보험료율(업종별 상이, 데모용 예시 0.7% - 전액 사업주 부담)
@@ -938,9 +1006,72 @@ function renderRemuneration(){
   }).join("");
 }
 
+/* ══════════════════════════════════════════════════════════
+   7-1. 인사평가 관리
+   ══════════════════════════════════════════════════════════ */
+function evalGrade(score){
+  if (score>=90) return "S";
+  if (score>=80) return "A";
+  if (score>=70) return "B";
+  if (score>=60) return "C";
+  return "D";
+}
+function evalCalc(row){
+  const score = Math.round(row.goalScore*0.6 + row.competencyScore*0.4);
+  const grade = evalGrade(score);
+  const diff = EVAL_GRADE_ORDER[grade] - EVAL_GRADE_ORDER[row.prevGrade];
+  return {score, grade, diff};
+}
+function renderEvaluation(){
+  const body = document.getElementById("evaluationBody");
+  if (!body) return;
+  body.innerHTML = evaluations.map((row, i) => {
+    const emp = empOf(row.empId) || {};
+    const c = evalCalc(row);
+    const diffLabel = c.diff>0 ? "▲ 상승" : (c.diff<0 ? "▼ 하락" : "- 유지");
+    const diffColor = c.diff>0 ? "var(--main)" : (c.diff<0 ? "var(--danger)" : "var(--gray-text)");
+    const gradeCls = (c.grade==="S"||c.grade==="A") ? "badge-ok" : (c.grade==="D" ? "badge-warn" : "badge-muted");
+    return `<tr>
+      <td>${row.empId}</td><td class="name-cell">${emp.name||"-"}</td><td>${emp.dept||"-"}</td>
+      <td>${row.period}</td>
+      <td><input type="number" class="num" value="${row.goalScore}" min="0" max="100" onchange="evaluations[${i}].goalScore=Number(this.value); renderAll();"></td>
+      <td><input type="number" class="num" value="${row.competencyScore}" min="0" max="100" onchange="evaluations[${i}].competencyScore=Number(this.value); renderAll();"></td>
+      <td class="num" style="font-weight:700;">${c.score}점</td>
+      <td><span class="badge ${gradeCls}">${c.grade}</span></td>
+      <td>${row.prevGrade}</td>
+      <td style="color:${diffColor}; font-weight:700;">${diffLabel}</td>
+      <td style="text-align:left; white-space:normal; font-size:12px; color:var(--gray-text); min-width:200px;">${row.comment}</td>
+    </tr>`;
+  }).join("");
+  renderEvalDistribution();
+  updateEvalKPI();
+}
+function renderEvalDistribution(){
+  const el = document.getElementById("evalDistChart");
+  if (!el) return;
+  const counts = {S:0, A:0, B:0, C:0, D:0};
+  evaluations.forEach(row => { counts[evalCalc(row).grade]++; });
+  const max = Math.max(...Object.values(counts), 1);
+  const colors = {S:"#1E40AF", A:"#3B82F6", B:"#64748B", C:"#D97706", D:"#DC2626"};
+  el.innerHTML = ["S","A","B","C","D"].map(g => `
+    <div class="att-bar-row">
+      <div class="att-bar-label"><span>${g}등급</span><span>${counts[g]}명</span></div>
+      <div class="att-bar-track"><div class="att-bar-fill" style="width:${counts[g]/max*100}%; background:${colors[g]};"></div></div>
+    </div>`).join("");
+}
+function updateEvalKPI(){
+  const calcs = evaluations.map(evalCalc);
+  const avg = calcs.reduce((s,c) => s+c.score, 0) / (calcs.length||1);
+  const topRate = Math.round(calcs.filter(c => c.grade==="S"||c.grade==="A").length / (calcs.length||1) * 100);
+  const upCount = calcs.filter(c => c.diff>0).length;
+  document.getElementById("evalAvgScore").textContent = avg.toFixed(1) + "점";
+  document.getElementById("evalTopRate").textContent = topRate + "%";
+  document.getElementById("evalUpCount").textContent = upCount + "명";
+}
+
 function renderAll(){
   renderAttendance(); renderPayroll(); renderAsset(); renderRetirement();
-  renderYearEnd(); renderRemuneration();
+  renderYearEnd(); renderRemuneration(); renderEvaluation();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -953,11 +1084,17 @@ const tabInfo = {
   asset:      {title:"자산·비품 관리", desc:"지급일자·교체주기를 입력하면 교체예정일과 확인 필요 여부가 자동으로 계산됩니다."},
   retirement: {title:"퇴직금·연금", desc:"입사일 기준 근속연수로 퇴직금 추정액과 DC형 퇴직연금 연간 적립액을 계산합니다."},
   yearend:    {title:"연말정산·보수총액신고", desc:"1년치 소득세 정산(연말정산)과 고용·산재보험료 정산(보수총액신고)을 추정합니다."},
+  evaluation: {title:"인사평가 관리", desc:"목표달성도·역량평가 점수로 종합등급(S~D)을 자동 산출하고, 전기 대비 등급 변동을 관리합니다."},
   faq:        {title:"사내규정 FAQ 챗봇", desc:"연차·경조사비·비품 신청 등 자주 묻는 질문에 키워드 매칭으로 답변하는 데모입니다."},
   turnover:   {title:"퇴사 위험도 예측", desc:"근태·평가·보상 데이터를 로지스틱 회귀 모델(Scikit-learn)에 학습시켜 산출한 가중치로 퇴사 위험도를 계산합니다."},
   experience: {title:"직원경험 데이터", desc:"매주 펄스 서베이 응답을 키워드 기반으로 감정 분석해, 조직의 몰입도 흐름을 데이터로 관리합니다."},
   attrisk:    {title:"근태 이상징후 분석", desc:"12~16주 근태 데이터를 분석해 번아웃 위험군과 이탈 징후 패턴을 자동으로 탐지합니다."},
 };
+document.querySelectorAll(".nav-section-label").forEach(label => {
+  label.addEventListener("click", () => {
+    label.closest(".nav-group").classList.toggle("collapsed");
+  });
+});
 document.querySelectorAll(".nav-item").forEach(item => {
   item.addEventListener("click", () => {
     document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
@@ -1027,6 +1164,18 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   });
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(retireRows), "4.퇴직금_퇴직연금");
 
+  const evalRows = evaluations.map(row => {
+    const emp = empOf(row.empId) || {};
+    const c = evalCalc(row);
+    return {
+      "사번": row.empId, "이름": emp.name, "부서": emp.dept, "평가기간": row.period,
+      "목표달성도": row.goalScore, "역량평가": row.competencyScore, "종합점수": c.score,
+      "종합등급": c.grade, "전기등급": row.prevGrade,
+      "등급변동": c.diff>0 ? "상승" : (c.diff<0 ? "하락" : "유지"), "평가코멘트": row.comment,
+    };
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(evalRows), "5.인사평가");
+
   XLSX.writeFile(wb, "인사총무_통합_자동화_데모.xlsx");
   showToast("엑셀 파일이 다운로드되었습니다.");
 });
@@ -1086,6 +1235,18 @@ function tryParseStructured(wb){
   if (s4){
     const rows = XLSX.utils.sheet_to_json(s4);
     rows.forEach(r => { if (r["사번"] && r["퇴직연금유형"]) retirementTypes[String(r["사번"])] = r["퇴직연금유형"]; });
+  }
+  const s5 = wb.Sheets["5.인사평가"];
+  if (s5){
+    const rows = XLSX.utils.sheet_to_json(s5);
+    if (rows.length){
+      matched = true;
+      evaluations = rows.map(r => ({
+        empId: String(r["사번"]), period: r["평가기간"] || "2026년 상반기",
+        goalScore: Number(r["목표달성도"]) || 0, competencyScore: Number(r["역량평가"]) || 0,
+        prevGrade: r["전기등급"] || "B", comment: r["평가코멘트"] || "",
+      }));
+    }
   }
   return matched;
 }
